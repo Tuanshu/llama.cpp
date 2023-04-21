@@ -1,7 +1,13 @@
 ./main -m ./models/gpt4all-7B/gpt4all-lora-quantized-ggml.bin -n 512 --repeat_penalty 1.0 --color -i -r "User:" -f prompts/chat-with-bob.txt
-
+<!-- Bob: Sure. The largest city in Europe is Moscow, the capital of Russia.
+User:西瓜是什麼?
+Bob: That would be pineapple in Mandarin.
+User: -->
 
 gpt4-x-alpaca-13b-native-ggml-q4_0.pt (這是GPTQ的)沒有經過ggml轉換, 就跑不過, 副檔名可能是pt或safetensor
+
+
+./main -m C:/Users/TuanShu/languege_models/ggml-gpt-x-alpaca/gpt4-x-alpaca-13b-native-ggml-q4_0.bin -n 512 --repeat_penalty 1.0 --color -i -r "User:" -f prompts/chat-with-bob.txt
 
 
 約需要8.2 GB memory
@@ -28,10 +34,68 @@ User:what is the largest country on the earth?
 Bob: Russia is the largest country on Earth. However, Canada has the second-largest land area.
 User: -->
 
+<!-- User:hey, can you write a simple flask program for me as example?
+Bob: Of course! Here's a simple flask program example:
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run() -->
+<!-- User:西瓜是什麼?
+Bob: 你想表达一切可能性的苹果一切，但是，西瓜一切都不一切。。。
+User: -->
+
+
+
+約需要8.2 GB memory~10GB (會越來越大, 無法一直運作)
+
+./main -m C:/Users/TuanShu/languege_models/vicuna-13B-1.1-GPTQ-4bit-128g-GGML/vicuna-13B-1.1-GPTQ-4bit-128g.GGML.bin -n 512 --repeat_penalty 1.0 --color -i -r "User:" -f prompts/chat-with-bob.txt
+
+
+<!-- User:hey, can you write a simple flask program for me as example?
+Bob: Of course. Here is a simple Flask program that displays "Hello, World!" on the main page:
+```
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run()
+```
+User: -->
+ <!-- Transcript of a dialog, where the User interacts with an Assistant named Bob. Bob is helpful, kind, honest, good at writing, and never fails to answer the User's requests immediately and with precision.
+
+User: Hello, Bob.
+Bob: Hello. How may I help you today?
+User: Please tell me the largest city in Europe.
+Bob: Sure. The largest city in Europe is Moscow, the capital of Russia.
+User:西瓜是什麼?
+
+Bob: 西瓜是一種水果，通常是紅色或橙色的。它的味道可以用來製作各種甜點，例如蛋糕、沙爆和甜品。
+User:華為是什麼?
+
+Bob: 華為（Papaver somniferum）是一種植物，它的芬藻可以用來製作藥物，例如激素和誘導性藥物。它也被用來製作某些藥品，例如麻辣輔和舒緩劑。
+User: -->
+
+
+
+
+
 llama
 alpaca: gpt4-x, 好像是社群, 在gpt4上訓練4 epoch
 Vicuna: TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g-GGML,這個readme把關係講得很清楚
-
+https://github.com/oobabooga/text-generation-webui/discussions/752
+https://github.com/oobabooga/text-generation-webui/discussions/727
 
 以下我還沒試過, 可能不用試 (還沒看到4bit, ggml版本)
 https://huggingface.co/liuhaotian/LLaVA-13b-delta-v0
@@ -217,3 +281,44 @@ medium	1.5 GB	~2.6 GB
 large	2.9 GB	~4.7 GB
 
 9. 從API講起
+
+
+
+10. benchmarking
+LLAMA 7B（Of course, if you have a larger machine(such as 3090Ti) can be replaced with a 13B, LLAMA13B is numerically superior to 175B GPT3）
+
+11. 中文支援, LLAMA預訓練時沒有用中文資料 (這是指哪個階段?)
+https://github.com/ymcui/Chinese-LLaMA-Alpaca
+https://github.com/Facico/Chinese-Vicuna
+
+注意Chinese-Vicuna不是基於Vicuna, 而是基於LLAMA 7B,
+應該是撞名了
+
+12. 英文的Vicuna / FastChat (lm-sys)
+https://github.com/lm-sys/FastChat 這個是Vicuna的chatbot api
+https://github.com/lm-sys/FastChat#vicuna-weights
+https://github.com/Vision-CAIR/MiniGPT-4/blob/main/PrepareVicuna.md
+70K conversations collected from ShareGPT.com.
+https://sharegpt.com/
+Vicuna-7B
+This conversion command needs around 30 GB of CPU RAM. See the "Low CPU Memory Conversion" section below if you do not have enough memory.
+
+python3 -m fastchat.model.apply_delta \
+    --base /path/to/llama-7b \
+    --target /output/path/to/vicuna-7b \
+    --delta lmsys/vicuna-7b-delta-v1.1
+
+他們好像也自幹了一個cpp interface
+
+13. shareGPT一個lm-sys的網頁, 但資料庫未公開(有爭議)
+https://github.com/lm-sys/FastChat/issues/90
+因為lm-sys的Vicuna會說中文, 這個資料集應該有中文吧 但leak版本可能沒有, 或者藏在HTML_cleaned_raw_dataset
+之後都先下載好了
+
+14. gpt4all有trainning script
+但是是train在LLAMA 7B, 原始model為16GB, not affortable now, 但如果我加裝到32GB, 那可能可以在cpu上train看看 ()
+
+
+15. openai finetuning
+https://vocus.cc/article/63a8accdfd8978000142c2b0
+https://community.openai.com/t/how-does-fine-tuning-really-work/39972
