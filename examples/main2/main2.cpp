@@ -258,6 +258,10 @@ int main(int argc, char ** argv) {
 
     std::vector<llama_token> embd;
 
+    // ts insert txt
+    std::ofstream output_file("output.txt", std::ios_base::app);
+
+
     while (n_remain != 0 || params.interactive) {
         // predict
         if (embd.size() > 0) {
@@ -349,8 +353,15 @@ int main(int argc, char ** argv) {
         // display text
         if (!input_noecho) {
             for (auto id : embd) {
+
                 printf("%s", llama_token_to_str(ctx, id));
+                // ts
+                std::string token_str = llama_token_to_str(ctx, id);
+                output_file << token_str;
             }
+            // ts add flush to ensure saving to file
+            output_file.flush();  // Explicitly flush the buffer
+
             fflush(stdout);
         }
         // reset color to default if we there is no pending user input
@@ -386,19 +397,28 @@ int main(int argc, char ** argv) {
                 // potentially set color to indicate we are taking user input
                 set_console_color(con_st, CONSOLE_COLOR_USER_INPUT);
 
+
 #if defined (_WIN32)
                 // Windows: must reactivate sigint handler after each signal
                 signal(SIGINT, sigint_handler);
 #endif
 
                 if (params.instruct) {
+
+
                     printf("\n> ");
+                    // ts: maybe no need?
+                    std::string token_str = "\n> ";
+                    output_file << token_str;
                 }
 
                 std::string buffer;
                 if (!params.input_prefix.empty()) {
                     buffer += params.input_prefix;
                     printf("%s", buffer.c_str());
+                    // ts: maybe no need?
+                    std::string token_str = buffer.c_str();
+                    output_file << token_str;
                 }
 
                 std::string line;
@@ -431,6 +451,14 @@ int main(int argc, char ** argv) {
                 // Add tokens to embd only if the input buffer is non-empty
                 // Entering a empty line lets the user pass control back
                 if (buffer.length() > 1) {
+
+
+                    // ts: Save user input to output file
+                    output_file << buffer;
+
+                    // ts: Flush the output file buffer to ensure user input is saved immediately
+                    output_file.flush();
+
 
                     // instruct mode: insert instruction prefix
                     if (params.instruct && !is_antiprompt) {
@@ -477,7 +505,8 @@ int main(int argc, char ** argv) {
 #if defined (_WIN32)
     signal(SIGINT, SIG_DFL);
 #endif
-
+    // ts add
+    output_file.close();
     llama_print_timings(ctx);
     llama_free(ctx);
 

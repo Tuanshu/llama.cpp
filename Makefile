@@ -33,7 +33,8 @@ endif
 # keep standard at C11 and C++11
 CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
-LDFLAGS  =
+# ts added -lrt
+LDFLAGS  = -lrt
 
 # warnings
 CFLAGS   += -Wall -Wextra -Wpedantic -Wcast-qual -Wdouble-promotion -Wshadow -Wstrict-prototypes -Wpointer-arith -Wno-unused-function
@@ -133,7 +134,7 @@ $(info I CC:       $(CCV))
 $(info I CXX:      $(CXXV))
 $(info )
 
-default: main quantize quantize-stats perplexity embedding
+default: main quantize quantize-stats perplexity embedding main2
 
 #
 # Build library
@@ -149,12 +150,18 @@ common.o: examples/common.cpp examples/common.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -vf *.o main quantize quantize-stats perplexity embedding benchmark-q4_0-matmult
+	rm -vf *.o main quantize quantize-stats perplexity embedding benchmark-q4_0-matmult main2
 
 main: examples/main/main.cpp ggml.o llama.o common.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 	@echo
 	@echo '====  Run ./main -h for help.  ===='
+	@echo
+
+main2: examples/main2/main2.cpp ggml.o llama.o common.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+	@echo
+	@echo '====  Run ./main2 -h for help.  ===='
 	@echo
 
 quantize: examples/quantize/quantize.cpp ggml.o llama.o
