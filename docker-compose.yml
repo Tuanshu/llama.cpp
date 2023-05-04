@@ -1,0 +1,9 @@
+# by ts
+version: "3.8"
+
+services:
+  llama:
+    image: ghcr.io/ggerganov/llama.cpp:full
+    command: --all-in-one "/models/" 7B
+    volumes:
+      - /path/to/models:/models
